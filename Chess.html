@@ -1,188 +1,522 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Imperial Chess - شطرنج الإمبراطور</title>
+  <title>Imperial Chess</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
   <style>
     :root {
-      --bg-dark: #121212;
-      --panel-bg: #1e1e1e;
-      --gold: #d4af37;
-      --gold-hover: #f3e5ab;
-      --text-color: #f5f5f5;
+      --bg-dark: #0a0a0c;
+      --panel-bg: rgba(18, 18, 22, 0.95);
+      --gold-accent: #c5a059;
+      --gold-bright: #e6c687;
+      --board-border: #2c2219;
+      --square-light: #e0d0b0;
+      --square-dark: #8b5a2b;
+      --text-main: #d4d4d8;
     }
+
     * {
       box-sizing: border-box;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
+
     body {
       margin: 0;
-      padding: 10px;
-      background-color: var(--bg-dark);
-      color: var(--text-color);
-      font-family: system-ui, -apple-system, Roboto, sans-serif;
+      padding: 0;
+      background: radial-gradient(circle at center, #1a181d 0%, #050507 100%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      overflow: hidden;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 1.6rem;
-      color: var(--gold);
-      letter-spacing: 1px;
-    }
-    .board-container {
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
-      max-width: 400px;
-      background: #2a2a2a;
-      padding: 10px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-      border: 2px solid var(--gold);
+      max-width: 420px;
+      padding: 10px 20px;
     }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: var(--gold-accent);
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
+    }
+
+    .icon-btn {
+      background: none;
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      color: var(--gold-accent);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:active {
+      background: var(--gold-accent);
+      color: #000;
+      transform: scale(0.95);
+    }
+
+    .board-frame {
+      position: relative;
+      width: 92vw;
+      max-width: 400px;
+      height: 92vw;
+      max-height: 400px;
+      padding: 8px;
+      background: linear-gradient(145deg, #2a1f17, #150f0b);
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(197, 160, 89, 0.15);
+      border: 1px solid var(--gold-accent);
+    }
+
     #board {
       width: 100%;
+      height: 100%;
+      border-radius: 6px;
+      overflow: hidden;
     }
-    .controls {
+
+    /* Custom Square Highlighting */
+    .highlight-sq {
+      box-shadow: inset 0 0 3px 3px rgba(230, 198, 135, 0.8) !important;
+    }
+    .possible-move {
+      position: relative;
+    }
+    .possible-move::after {
+      content: '';
+      position: absolute;
+      top: 35%;
+      left: 35%;
+      width: 30%;
+      height: 30%;
+      background: rgba(197, 160, 89, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .status-bar {
       margin-top: 15px;
-      width: 100%;
+      width: 92vw;
+      max-width: 400px;
+      background: var(--panel-bg);
+      border: 1px solid rgba(197, 160, 89, 0.2);
+      border-radius: 8px;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+
+    .turn-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .turn-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 8px #fff;
+    }
+
+    .turn-dot.black {
+      background: #333;
+      box-shadow: 0 0 8px #000;
+      border: 1px solid #666;
+    }
+
+    .controls {
+      margin-top: 12px;
+      width: 92vw;
       max-width: 400px;
       display: flex;
-      flex-direction: column;
       gap: 10px;
     }
-    .status-panel {
-      background: var(--panel-bg);
-      padding: 10px 15px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 0.95rem;
-      color: #ccc;
-      border: 1px solid #333;
-    }
-    .btn-group {
-      display: flex;
-      gap: 8px;
-    }
-    button {
+
+    .action-btn {
       flex: 1;
       padding: 12px;
-      font-size: 0.95rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
+      background: linear-gradient(180deg, rgba(35,35,45,1) 0%, rgba(20,20,28,1) 100%);
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      color: var(--gold-accent);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
       cursor: pointer;
-      background-color: var(--gold);
-      color: #000;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
     }
-    button:active {
-      background-color: var(--gold-hover);
+
+    .action-btn:active {
+      border-color: var(--gold-bright);
+      color: var(--gold-bright);
+      transform: translateY(1px);
+    }
+
+    /* Settings Modal */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #141418;
+      border: 1px solid var(--gold-accent);
+      border-radius: 12px;
+      width: 85vw;
+      max-width: 350px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+      padding-bottom: 8px;
+    }
+
+    .modal-title {
+      color: var(--gold-accent);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      font-size: 0.85rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 22px;
+      background: #2a2a35;
+      border-radius: 11px;
+      cursor: pointer;
+      border: 1px solid #444;
+    }
+
+    .toggle-switch.on {
+      background: var(--gold-accent);
+    }
+
+    .toggle-handle {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+
+    .toggle-switch.on .toggle-handle {
+      transform: translateX(22px);
+      background: #000;
     }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <h1>IMPERIAL CHESS</h1>
+  <div class="app-header">
+    <div class="brand">Imperial Chess</div>
+    <button class="icon-btn" onclick="toggleModal(true)">⚙</button>
   </div>
 
-  <div class="board-container">
+  <div class="board-frame">
     <div id="board"></div>
   </div>
 
+  <div class="status-bar">
+    <div class="turn-indicator">
+      <div class="turn-dot" id="turnDot"></div>
+      <span id="turnText">WHITE TO MOVE</span>
+    </div>
+    <div id="gameStatus" style="color: #888;">READY</div>
+  </div>
+
   <div class="controls">
-    <div class="status-panel" id="status">دور اللاعب (الأبيض)</div>
-    <div class="btn-group">
-      <button onclick="resetGame()">مباراة جديدة</button>
+    <button class="action-btn" onclick="undoMove()">↩ UNDO</button>
+    <button class="action-btn" onclick="resetGame()">⚔ RESTART</button>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">SETTINGS</div>
+        <button class="icon-btn" style="width: 28px; height: 28px;" onclick="toggleModal(false)">✕</button>
+      </div>
+      <div class="setting-row">
+        <span>Sound Effects</span>
+        <div class="toggle-switch on" id="sfxToggle" onclick="toggleSetting('sfx')"><div class="toggle-handle"></div></div>
+      </div>
+      <div class="setting-row">
+        <span>Dramatic Music</span>
+        <div class="toggle-switch" id="musicToggle" onclick="toggleSetting('music')"><div class="toggle-handle"></div></div>
+      </div>
+      <div class="setting-row">
+        <span>Show Move Hints</span>
+        <div class="toggle-switch on" id="hintsToggle" onclick="toggleSetting('hints')"><div class="toggle-handle"></div></div>
+      </div>
     </div>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 
   <script>
     let board = null;
     let game = new Chess();
-    const $status = $('#status');
+    let selectedSquare = null;
+    
+    // Settings
+    let settings = {
+      sfx: true,
+      music: false,
+      hints: true
+    };
 
-    function onDragStart (source, piece) {
-      if (game.game_over()) return false;
-      if (piece.search(/^b/) !== -1) return false;
+    // Web Audio Synthesizer Engine
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let musicInterval = null;
+
+    function playWoodSound(type = 'move') {
+      if (!settings.sfx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'triangle';
+      
+      if (type === 'move') {
+        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } else if (type === 'capture') {
+        osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.12);
+      }
     }
 
-    function makeRandomMove () {
+    function toggleMusicEngine(enable) {
+      if (enable) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        let step = 0;
+        const notes = [110, 116.54, 98, 92.5]; // Dark imperial bass progression
+        musicInterval = setInterval(() => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(notes[step % notes.length], audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 1.8);
+          step++;
+        }, 2000);
+      } else {
+        if (musicInterval) clearInterval(musicInterval);
+      }
+    }
+
+    // Board & Logic
+    function removeHighlights() {
+      $('#board .square-55d63').removeClass('highlight-sq possible-move');
+    }
+
+    function highlightSquare(sq) {
+      $('#board .square-' + sq).addClass('highlight-sq');
+    }
+
+    function showPossibleMoves(sq) {
+      if (!settings.hints) return;
+      const moves = game.moves({ square: sq, verbose: true });
+      moves.forEach(m => {
+        $('#board .square-' + m.to).addClass('possible-move');
+      });
+    }
+
+    function handleSquareClick(square) {
+      // 1. Select a piece
+      if (!selectedSquare) {
+        const piece = game.get(square);
+        if (piece && piece.color === game.turn()) {
+          selectedSquare = square;
+          removeHighlights();
+          highlightSquare(square);
+          showPossibleMoves(square);
+        }
+        return;
+      }
+
+      // 2. Try moving to destination
+      const move = game.move({
+        from: selectedSquare,
+        to: square,
+        promotion: 'q'
+      });
+
+      if (move) {
+        board.position(game.fen());
+        playWoodSound(move.captured ? 'capture' : 'move');
+        selectedSquare = null;
+        removeHighlights();
+        updateUI();
+
+        // AI Move Response (Trigger after delay)
+        if (!game.game_over() && game.turn() === 'b') {
+          setTimeout(makeAIMove, 300);
+        }
+      } else {
+        // Switch selection or cancel
+        const piece = game.get(square);
+        removeHighlights();
+        if (piece && piece.color === game.turn()) {
+          selectedSquare = square;
+          highlightSquare(square);
+          showPossibleMoves(square);
+        } else {
+          selectedSquare = null;
+        }
+      }
+    }
+
+    function makeAIMove() {
       const possibleMoves = game.moves();
       if (possibleMoves.length === 0) return;
 
       const randomIdx = Math.floor(Math.random() * possibleMoves.length);
-      game.move(possibleMoves[randomIdx]);
+      const move = game.move(possibleMoves[randomIdx]);
       board.position(game.fen());
-      updateStatus();
+      playWoodSound(move.captured ? 'capture' : 'move');
+      updateUI();
     }
 
-    function onDrop (source, target) {
-      const move = game.move({
-        from: source,
-        to: target,
-        promotion: 'q'
-      });
-
-      if (move === null) return 'snapback';
-
-      updateStatus();
-      window.setTimeout(makeRandomMove, 250);
-    }
-
-    function onSnapEnd () {
-      board.position(game.fen());
-    }
-
-    function updateStatus () {
-      let status = '';
-      let moveColor = game.turn() === 'b' ? 'الأسود' : 'الأبيض';
+    function updateUI() {
+      const isWhite = game.turn() === 'w';
+      $('#turnDot').toggleClass('black', !isWhite);
+      $('#turnText').text(isWhite ? 'WHITE TO MOVE' : 'BLACK TO MOVE');
 
       if (game.in_checkmate()) {
-        status = 'انتهت اللعبة، كش ملك! الفائز: ' + (game.turn() === 'w' ? 'الأسود' : 'الأبيض');
+        $('#gameStatus').text('CHECKMATE').css('color', '#ef4444');
       } else if (game.in_draw()) {
-        status = 'انتهت اللعبة بالتعادل!';
+        $('#gameStatus').text('DRAW').css('color', '#eab308');
+      } else if (game.in_check()) {
+        $('#gameStatus').text('CHECK!').css('color', '#f97316');
       } else {
-        status = 'دور: ' + moveColor;
-        if (game.in_check()) {
-          status += ' (كش ملك!)';
-        }
+        $('#gameStatus').text('IN PROGRESS').css('color', '#888');
       }
-      $status.html(status);
     }
 
-    const config = {
-      draggable: true,
-      position: 'start',
-      onDragStart: onDragStart,
-      onDrop: onDrop,
-      onSnapEnd: onSnapEnd,
-      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-    };
-
-    board = Chessboard('board', config);
-    updateStatus();
+    function undoMove() {
+      game.undo(); // Undo AI
+      game.undo(); // Undo Player
+      board.position(game.fen());
+      selectedSquare = null;
+      removeHighlights();
+      updateUI();
+    }
 
     function resetGame() {
       game.reset();
       board.start();
-      updateStatus();
+      selectedSquare = null;
+      removeHighlights();
+      updateUI();
     }
+
+    function toggleModal(show) {
+      $('#settingsModal').toggleClass('active', show);
+    }
+
+    function toggleSetting(key) {
+      settings[key] = !settings[key];
+      $('#' + key + 'Toggle').toggleClass('on', settings[key]);
+      if (key === 'music') toggleMusicEngine(settings.music);
+    }
+
+    // Initialize Chessboard
+    const config = {
+      draggable: false, // Click-to-move only
+      position: 'start',
+      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+    };
+
+    board = Chessboard('board', config);
+
+    // Bind Tap/Click Event to Squares
+    $('#board').on('click', '.square-55d63', function () {
+      const square = $(this).attr('data-square');
+      handleSquareClick(square);
+    });
+
+    updateUI();
   </script>
 </body>
 </html>
