@@ -3,32 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Imperial Chess 3D - Grandmaster Edition</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <title>Imperial Chess Master 3D</title>
   <style>
     :root {
-      --bg-gradient: radial-gradient(circle at center, #1c130d 0%, #080504 100%);
-      --gold-accent: #d4af37;
-      --gold-bright: #fff0aa;
-      --panel-bg: rgba(20, 15, 12, 0.95);
-      --board-wood-1: #8b5a2b;
-      --board-wood-2: #e0d0b0;
-      --board-shadow: rgba(0, 0, 0, 0.9);
+      --bg-radial: radial-gradient(circle at center, #2c1a0e 0%, #0a0503 100%);
+      --gold-main: #d4af37;
+      --gold-light: #fff3a8;
+      --wood-dark: #4a2810;
+      --wood-light: #d8b888;
+      --panel-marble: linear-gradient(135deg, #281d18 0%, #110a07 100%);
     }
 
     * {
       box-sizing: border-box;
       touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       margin: 0;
       padding: 0;
-      background: var(--bg-gradient);
+      background: var(--bg-radial);
       color: #e5e5e5;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Georgia', serif;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -37,239 +35,264 @@
       overflow: hidden;
     }
 
+    /* Portal Menu (Main Screen) */
+    .portal-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-radial);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .portal-title {
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: var(--gold-main);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .menu-btn {
+      width: 85vw;
+      max-width: 320px;
+      padding: 16px;
+      background: linear-gradient(180deg, #4a3319 0%, #211307 100%);
+      border: 2px solid var(--gold-main);
+      border-radius: 8px;
+      color: var(--gold-light);
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.2);
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .menu-btn:active {
+      transform: scale(0.97);
+      background: var(--gold-main);
+      color: #000;
+    }
+
+    /* Game Interface */
     .app-header {
+      width: 92vw;
+      max-width: 400px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 95vw;
-      max-width: 440px;
-      padding: 10px 5px;
-    }
-
-    .brand {
-      font-size: 1.1rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      color: var(--gold-accent);
-      text-transform: uppercase;
-      text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+      margin-bottom: 10px;
     }
 
     .icon-btn {
-      background: rgba(212, 175, 55, 0.1);
-      border: 1px solid var(--gold-accent);
-      color: var(--gold-accent);
-      width: 36px;
-      height: 36px;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-main);
+      color: var(--gold-main);
+      width: 40px; height: 40px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; cursor: pointer;
     }
 
-    .icon-btn:active {
-      background: var(--gold-accent);
-      color: #000;
-      transform: scale(0.92);
-    }
-
-    /* 3D Isometric View Container */
-    .board-perspective {
-      perspective: 1000px;
-      width: 95vw;
-      max-width: 420px;
-      height: 95vw;
-      max-height: 420px;
+    .board-container {
+      width: 92vw;
+      height: 92vw;
+      max-width: 400px;
+      max-height: 400px;
+      position: relative;
+      perspective: 800px;
     }
 
     .board-frame {
-      width: 100%;
-      height: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #3d2612 0%, #170d05 100%);
+      width: 100%; height: 100%;
+      background: linear-gradient(145deg, #3d2410, #180d05);
       border-radius: 12px;
-      box-shadow: 0 25px 50px var(--board-shadow), 0 0 20px rgba(212, 175, 55, 0.2);
-      border: 2px solid var(--gold-accent);
-      transform: rotateX(16deg) rotateZ(0deg);
-      transition: transform 0.5s ease;
-      box-sizing: border-box;
+      padding: 10px;
+      border: 3px solid var(--gold-main);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 15px rgba(212, 175, 55, 0.2);
+      transition: transform 0.4s ease;
     }
 
-    #board {
-      width: 100%;
-      height: 100%;
+    .board-frame.mode-3d {
+      transform: rotateX(25deg) scale(0.95);
+    }
+
+    .board-frame.mode-2d {
+      transform: rotateX(0deg) scale(1);
+    }
+
+    .chess-grid {
+      width: 100%; height: 100%;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
       border-radius: 4px;
-      box-shadow: inset 0 0 10px #000;
+      overflow: hidden;
     }
 
-    /* Wood Themes (Dark & Light Squares) */
-    .theme-1 .white-1e1d3 { background-color: #e0d0b0 !important; } .theme-1 .black-3c85d { background-color: #8b5a2b !important; }
-    .theme-2 .white-1e1d3 { background-color: #d2b48c !important; } .theme-2 .black-3c85d { background-color: #5c4033 !important; }
-    .theme-3 .white-1e1d3 { background-color: #f0d9b5 !important; } .theme-3 .black-3c85d { background-color: #b58863 !important; }
-    .theme-4 .white-1e1d3 { background-color: #e2c499 !important; } .theme-4 .black-3c85d { background-color: #6a3812 !important; }
-    .theme-5 .white-1e1d3 { background-color: #cccccc !important; } .theme-5 .black-3c85d { background-color: #2b2b2b !important; }
-    .theme-6 .white-1e1d3 { background-color: #e6ccab !important; } .theme-6 .black-3c85d { background-color: #804000 !important; }
-    .theme-7 .white-1e1d3 { background-color: #dec29b !important; } .theme-7 .black-3c85d { background-color: #4a2f13 !important; }
-    .theme-8 .white-1e1d3 { background-color: #d9c0a3 !important; } .theme-8 .black-3c85d { background-color: #734d26 !important; }
-    .theme-9 .white-1e1d3 { background-color: #b8b8b8 !important; } .theme-9 .black-3c85d { background-color: #404040 !important; }
-    .theme-10 .white-1e1d3 { background-color: #1a1a1a !important; } .theme-10 .black-3c85d { background-color: #0d0d0d !important; }
-
-    /* Highlights & Animations */
-    .highlight-sq {
-      box-shadow: inset 0 0 10px 4px var(--gold-bright) !important;
-      background-color: rgba(212, 175, 55, 0.4) !important;
+    .square {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      cursor: pointer;
     }
 
-    .possible-move::after {
+    .sq-light { background-color: var(--wood-light); }
+    .sq-dark { background-color: var(--wood-dark); }
+
+    .sq-selected {
+      box-shadow: inset 0 0 0 3px var(--gold-light) !important;
+      background-color: rgba(212, 175, 55, 0.6) !important;
+    }
+
+    .sq-hint::after {
       content: '';
-      position: absolute;
-      top: 35%; left: 35%;
       width: 30%; height: 30%;
-      background: var(--gold-bright);
+      background: rgba(212, 175, 55, 0.8);
       border-radius: 50%;
-      box-shadow: 0 0 8px var(--gold-accent);
-      pointer-events: none;
+      box-shadow: 0 0 8px var(--gold-light);
     }
 
-    /* Timers & Status Panel */
-    .status-panel {
-      margin-top: 15px;
-      width: 95vw;
-      max-width: 420px;
-      background: var(--panel-bg);
-      border: 1px solid rgba(212, 175, 55, 0.3);
+    /* Banner Overlay (Checkmate) */
+    .banner-overlay {
+      position: absolute;
+      top: 35%; left: 5%; right: 5%;
+      background: var(--panel-marble);
+      border: 2px solid var(--gold-main);
       border-radius: 8px;
-      padding: 8px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+      display: none;
+      z-index: 50;
     }
 
-    .timer-box {
-      font-family: monospace;
-      font-size: 1rem;
+    .banner-title {
+      font-size: 1.5rem;
+      color: #ef4444;
       font-weight: bold;
-      color: var(--gold-accent);
-      background: #000;
-      padding: 4px 8px;
-      border-radius: 4px;
-      border: 1px solid #333;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    /* Controls & Status */
+    .status-panel {
+      width: 92vw; max-width: 400px;
+      margin-top: 15px;
+      background: var(--panel-marble);
+      border: 1px solid var(--gold-main);
+      border-radius: 8px;
+      padding: 10px 15px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.9rem; font-weight: bold;
     }
 
     .controls {
+      width: 92vw; max-width: 400px;
       margin-top: 10px;
-      width: 95vw;
-      max-width: 420px;
-      display: flex;
-      gap: 8px;
+      display: flex; gap: 10px;
     }
 
-    .action-btn {
-      flex: 1;
-      padding: 10px;
-      background: linear-gradient(180deg, #2a1f18 0%, #140d08 100%);
-      border: 1px solid var(--gold-accent);
-      color: var(--gold-accent);
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: all 0.2s;
+    .ctrl-btn {
+      flex: 1; padding: 12px;
+      background: linear-gradient(180deg, #3d2817 0%, #1a1008 100%);
+      border: 1px solid var(--gold-main);
+      color: var(--gold-main);
+      border-radius: 6px; font-weight: bold;
+      cursor: pointer; text-align: center;
     }
 
-    .action-btn:active {
-      background: var(--gold-accent);
-      color: #000;
-    }
-
-    /* Settings Modal */
     .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
+      backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 300;
     }
-
-    .modal.active { opacity: 1; pointer-events: auto; }
 
     .modal-content {
-      background: #140e0a;
-      border: 1px solid var(--gold-accent);
+      background: #1a110a;
+      border: 2px solid var(--gold-main);
       border-radius: 12px;
-      width: 90vw;
-      max-width: 380px;
+      width: 88vw; max-width: 360px;
       padding: 20px;
-      max-height: 85vh;
-      overflow-y: auto;
     }
 
     .setting-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 0.85rem;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.2);
     }
 
-    select {
-      background: #000;
-      color: var(--gold-accent);
-      border: 1px solid var(--gold-accent);
-      padding: 5px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      outline: none;
+    select, input[type="checkbox"] {
+      background: #000; color: var(--gold-main);
+      border: 1px solid var(--gold-main); padding: 6px; border-radius: 4px;
     }
   </style>
 </head>
 <body>
 
+  <!-- PORTAL MENU -->
+  <div class="portal-screen" id="portalMenu">
+    <div class="portal-title">Imperial Chess</div>
+    <div class="menu-btn" onclick="startGame()">⚔ SINGLE PLAYER</div>
+    <div class="menu-btn" onclick="toggleModal(true)">⚙ OPTIONS</div>
+  </div>
+
+  <!-- GAME INTERFACE -->
   <div class="app-header">
-    <div class="brand">Imperial Chess 3D</div>
+    <button class="icon-btn" onclick="showPortal()">🏠</button>
+    <div style="font-weight:bold; color:var(--gold-main); letter-spacing:2px;">IMPERIAL CHESS</div>
     <button class="icon-btn" onclick="toggleModal(true)">⚙</button>
   </div>
 
-  <div class="board-perspective">
-    <div class="board-frame theme-1" id="boardFrame">
-      <div id="board"></div>
+  <div class="board-container">
+    <div class="board-frame mode-3d" id="boardFrame">
+      <div class="chess-grid" id="chessGrid"></div>
+    </div>
+    
+    <div class="banner-overlay" id="bannerOverlay">
+      <div class="banner-title" id="bannerTitle">ÉCHEC ET MAT!</div>
+      <div id="bannerSub" style="color:var(--gold-light);">Your opponent won!</div>
     </div>
   </div>
 
   <div class="status-panel">
-    <div class="timer-box" id="blackTimer">10:00</div>
-    <div id="statusText" style="color: var(--gold-accent); font-weight: bold;">WHITE TO MOVE</div>
-    <div class="timer-box" id="whiteTimer">10:00</div>
+    <span id="turnText" style="color:var(--gold-main);">WHITE TO MOVE</span>
+    <span id="timerText" style="font-family:monospace; font-size:1.1rem;">10:00</span>
   </div>
 
   <div class="controls">
-    <button class="action-btn" onclick="undoMove()">↩ Undo</button>
-    <button class="action-btn" onclick="resetGame()">⚔ Restart</button>
+    <button class="ctrl-btn" onclick="undoMove()">↩ UNDO</button>
+    <button class="ctrl-btn" onclick="restartGame()">⚔ RESTART</button>
   </div>
 
-  <!-- Settings Modal -->
-  <div class="modal" id="settingsModal">
+  <!-- OPTIONS MODAL -->
+  <div class="modal" id="optionsModal">
     <div class="modal-content">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3 style="margin:0; color:var(--gold-accent);">SETTINGS</h3>
-        <button class="icon-btn" style="width:28px; height:28px;" onclick="toggleModal(false)">✕</button>
+        <h3 style="margin:0; color:var(--gold-main);">OPTIONS</h3>
+        <button class="icon-btn" style="width:30px; height:30px;" onclick="toggleModal(false)">✕</button>
       </div>
 
       <div class="setting-row">
-        <span>AI Difficulty</span>
+        <span>View Mode</span>
+        <select id="viewMode" onchange="setViewMode(this.value)">
+          <option value="mode-3d">3D View</option>
+          <option value="mode-2d">2D Flat View</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <span>AI Level</span>
         <select id="aiLevel">
           <option value="1">1. Novice</option>
           <option value="2">2. Learner</option>
@@ -286,173 +309,172 @@
       </div>
 
       <div class="setting-row">
-        <span>Wooden Table Style</span>
-        <select id="tableTheme" onchange="changeTheme(this.value)">
-          <option value="theme-1">1. Dark Oak</option>
-          <option value="theme-2">2. Mahogany</option>
-          <option value="theme-3">3. Vintage Walnut</option>
-          <option value="theme-4">4. Rosewood</option>
-          <option value="theme-5">5. Ebony Wood</option>
-          <option value="theme-6">6. Cedar</option>
-          <option value="theme-7">7. Teak</option>
-          <option value="theme-8">8. Chestnut</option>
-          <option value="theme-9">9. Smoked Ash</option>
-          <option value="theme-10">10. Obsidian Wood</option>
-        </select>
-      </div>
-
-      <div class="setting-row">
-        <span>Thinking Timer</span>
-        <select id="timerSelect" onchange="setTimerMode(this.value)">
-          <option value="0">Disabled</option>
-          <option value="300">5 Minutes</option>
-          <option value="600" selected>10 Minutes</option>
-        </select>
-      </div>
-
-      <div class="setting-row">
-        <span>Audiomachine Music</span>
+        <span>Dramatic Music</span>
         <input type="checkbox" id="musicToggle" onchange="toggleMusic(this.checked)">
       </div>
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-
   <script>
-    let board = null;
     let game = new Chess();
     let selectedSquare = null;
-    let wTime = 600, bTime = 600, timerInterval = null;
+    const pieceSymbols = {
+      'w': { 'p': '♙', 'r': '♖', 'n': '♘', 'b': '♗', 'q': '♕', 'k': '♔' },
+      'b': { 'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚' }
+    };
 
-    // Web Audio System (Wood Sounds & Audiomachine Orchestra Synth)
+    // Web Audio Synthesizer (Wood Sounds, Checkmate Fanfare & Audiomachine Orchestra)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let orchestraInterval = null;
+    let musicInterval = null;
 
-    function playWoodSound(isCapture = false) {
+    function playSound(type) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      
-      const freq = isCapture ? 70 : 130;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.09);
-      
-      gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.09);
 
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.09);
+      if (type === 'move' || type === 'capture') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(type === 'capture' ? 80 : 140, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'checkmate') {
+        // Dramatic Low Brass Fanfare
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(55, audioCtx.currentTime + 1.2);
+        gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.2);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 1.2);
+      }
     }
 
     function toggleMusic(enable) {
       if (enable) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        let idx = 0;
-        const bassProgression = [65.41, 69.30, 58.27, 55.00]; // Epic C minor Audiomachine theme
-        orchestraInterval = setInterval(() => {
+        let step = 0;
+        const notes = [65.41, 69.30, 58.27, 55.00];
+        musicInterval = setInterval(() => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(bassProgression[idx % 4], audioCtx.currentTime);
+          osc.frequency.setValueAtTime(notes[step % 4], audioCtx.currentTime);
           gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 2.5);
-          idx++;
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.4);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.start(); osc.stop(audioCtx.currentTime + 2.4);
+          step++;
         }, 2500);
-      } else {
-        if (orchestraInterval) clearInterval(orchestraInterval);
+      } else if (musicInterval) clearInterval(musicInterval);
+    }
+
+    // Render Grid
+    function renderBoard() {
+      const grid = document.getElementById('chessGrid');
+      grid.innerHTML = '';
+      const boardState = game.board();
+
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+          const sqName = String.fromCharCode(97 + c) + (8 - r);
+          const sqDiv = document.createElement('div');
+          sqDiv.className = `square ${(r + c) % 2 === 0 ? 'sq-light' : 'sq-dark'}`;
+          sqDiv.dataset.square = sqName;
+
+          const piece = boardState[r][c];
+          if (piece) {
+            sqDiv.innerHTML = pieceSymbols[piece.color][piece.type];
+            sqDiv.style.color = piece.color === 'w' ? '#fff' : '#000';
+            sqDiv.style.textShadow = piece.color === 'w' ? '0 2px 4px #000' : '0 1px 2px #fff';
+          }
+
+          if (selectedSquare === sqName) sqDiv.classList.add('sq-selected');
+
+          sqDiv.onclick = () => onSquareClick(sqName);
+          grid.appendChild(sqDiv);
+        }
       }
     }
 
-    // Board Interactions
-    function removeHighlights() {
-      $('#board .square-55d63').removeClass('highlight-sq possible-move');
-    }
-
-    function handleSquareClick(sq) {
+    function onSquareClick(sq) {
       if (!selectedSquare) {
         const piece = game.get(sq);
         if (piece && piece.color === game.turn()) {
           selectedSquare = sq;
-          removeHighlights();
-          $('#board .square-' + sq).addClass('highlight-sq');
-          game.moves({ square: sq, verbose: true }).forEach(m => {
-            $('#board .square-' + m.to).addClass('possible-move');
-          });
+          renderBoard();
+          showHints(sq);
         }
         return;
       }
 
       const move = game.move({ from: selectedSquare, to: sq, promotion: 'q' });
       if (move) {
-        board.position(game.fen());
-        playWoodSound(move.captured);
+        playSound(move.captured ? 'capture' : 'move');
         selectedSquare = null;
-        removeHighlights();
-        updateGame();
+        renderBoard();
+        checkGameState();
 
         if (!game.game_over() && game.turn() === 'b') {
-          setTimeout(triggerAI, 400);
+          setTimeout(makeAIMove, 300);
         }
       } else {
         selectedSquare = null;
-        removeHighlights();
+        renderBoard();
       }
     }
 
-    function triggerAI() {
+    function showHints(sq) {
+      const moves = game.moves({ square: sq, verbose: true });
+      moves.forEach(m => {
+        const el = document.querySelector(`[data-square="${m.to}"]`);
+        if (el) el.classList.add('sq-hint');
+      });
+    }
+
+    function makeAIMove() {
       const moves = game.moves();
       if (moves.length === 0) return;
       const move = game.move(moves[Math.floor(Math.random() * moves.length)]);
-      board.position(game.fen());
-      playWoodSound(move.captured);
-      updateGame();
+      playSound(move.captured ? 'capture' : 'move');
+      renderBoard();
+      checkGameState();
     }
 
-    function updateGame() {
-      const turn = game.turn() === 'w' ? 'WHITE TO MOVE' : 'BLACK TO MOVE';
-      $('#statusText').text(game.in_checkmate() ? 'CHECKMATE!' : turn);
+    function checkGameState() {
+      if (game.in_checkmate()) {
+        playSound('checkmate');
+        document.getElementById('bannerOverlay').style.display = 'block';
+      } else {
+        document.getElementById('turnText').innerText = game.turn() === 'w' ? 'WHITE TO MOVE' : 'BLACK TO MOVE';
+      }
     }
 
-    function changeTheme(themeClass) {
-      $('#boardFrame').attr('class', 'board-frame ' + themeClass);
+    function setViewMode(mode) {
+      document.getElementById('boardFrame').className = `board-frame ${mode}`;
     }
 
     function undoMove() {
       game.undo(); game.undo();
-      board.position(game.fen());
-      removeHighlights();
-      updateGame();
+      selectedSquare = null;
+      renderBoard();
     }
 
-    function resetGame() {
+    function restartGame() {
       game.reset();
-      board.start();
-      removeHighlights();
-      updateGame();
+      selectedSquare = null;
+      document.getElementById('bannerOverlay').style.display = 'none';
+      renderBoard();
     }
 
-    function toggleModal(show) { $('#settingsModal').toggleClass('active', show); }
+    function startGame() { document.getElementById('portalMenu').style.display = 'none'; renderBoard(); }
+    function showPortal() { document.getElementById('portalMenu').style.display = 'flex'; }
+    function toggleModal(show) { document.getElementById('optionsModal').style.display = show ? 'flex' : 'none'; }
 
-    // Init
-    board = Chessboard('board', {
-      position: 'start',
-      draggable: false,
-      pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-    });
-
-    $('#board').on('click', '.square-55d63', function() {
-      handleSquareClick($(this).attr('data-square'));
-    });
+    renderBoard();
   </script>
 </body>
 </html>
