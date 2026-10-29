@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Imperial Chess</title>
+  <title>Imperial Chess 3D - Grandmaster Edition</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
   <style>
     :root {
-      --bg-dark: #0a0a0c;
-      --panel-bg: rgba(18, 18, 22, 0.95);
-      --gold-accent: #c5a059;
-      --gold-bright: #e6c687;
-      --board-border: #2c2219;
-      --square-light: #e0d0b0;
-      --square-dark: #8b5a2b;
-      --text-main: #d4d4d8;
+      --bg-gradient: radial-gradient(circle at center, #1c130d 0%, #080504 100%);
+      --gold-accent: #d4af37;
+      --gold-bright: #fff0aa;
+      --panel-bg: rgba(20, 15, 12, 0.95);
+      --board-wood-1: #8b5a2b;
+      --board-wood-2: #e0d0b0;
+      --board-shadow: rgba(0, 0, 0, 0.9);
     }
 
     * {
@@ -27,8 +26,8 @@
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at center, #1a181d 0%, #050507 100%);
-      color: var(--text-main);
+      background: var(--bg-gradient);
+      color: #e5e5e5;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -42,145 +41,151 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
-      max-width: 420px;
-      padding: 10px 20px;
+      width: 95vw;
+      max-width: 440px;
+      padding: 10px 5px;
     }
 
     .brand {
       font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: 3px;
+      font-weight: 900;
+      letter-spacing: 2px;
       color: var(--gold-accent);
       text-transform: uppercase;
-      text-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
+      text-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
     }
 
     .icon-btn {
-      background: none;
-      border: 1px solid rgba(197, 160, 89, 0.3);
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid var(--gold-accent);
       color: var(--gold-accent);
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      font-size: 1rem;
       transition: all 0.2s ease;
     }
 
     .icon-btn:active {
       background: var(--gold-accent);
       color: #000;
-      transform: scale(0.95);
+      transform: scale(0.92);
+    }
+
+    /* 3D Isometric View Container */
+    .board-perspective {
+      perspective: 1000px;
+      width: 95vw;
+      max-width: 420px;
+      height: 95vw;
+      max-height: 420px;
     }
 
     .board-frame {
-      position: relative;
-      width: 92vw;
-      max-width: 400px;
-      height: 92vw;
-      max-height: 400px;
-      padding: 8px;
-      background: linear-gradient(145deg, #2a1f17, #150f0b);
+      width: 100%;
+      height: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #3d2612 0%, #170d05 100%);
       border-radius: 12px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(197, 160, 89, 0.15);
-      border: 1px solid var(--gold-accent);
+      box-shadow: 0 25px 50px var(--board-shadow), 0 0 20px rgba(212, 175, 55, 0.2);
+      border: 2px solid var(--gold-accent);
+      transform: rotateX(16deg) rotateZ(0deg);
+      transition: transform 0.5s ease;
+      box-sizing: border-box;
     }
 
     #board {
       width: 100%;
       height: 100%;
-      border-radius: 6px;
-      overflow: hidden;
+      border-radius: 4px;
+      box-shadow: inset 0 0 10px #000;
     }
 
-    /* Custom Square Highlighting */
+    /* Wood Themes (Dark & Light Squares) */
+    .theme-1 .white-1e1d3 { background-color: #e0d0b0 !important; } .theme-1 .black-3c85d { background-color: #8b5a2b !important; }
+    .theme-2 .white-1e1d3 { background-color: #d2b48c !important; } .theme-2 .black-3c85d { background-color: #5c4033 !important; }
+    .theme-3 .white-1e1d3 { background-color: #f0d9b5 !important; } .theme-3 .black-3c85d { background-color: #b58863 !important; }
+    .theme-4 .white-1e1d3 { background-color: #e2c499 !important; } .theme-4 .black-3c85d { background-color: #6a3812 !important; }
+    .theme-5 .white-1e1d3 { background-color: #cccccc !important; } .theme-5 .black-3c85d { background-color: #2b2b2b !important; }
+    .theme-6 .white-1e1d3 { background-color: #e6ccab !important; } .theme-6 .black-3c85d { background-color: #804000 !important; }
+    .theme-7 .white-1e1d3 { background-color: #dec29b !important; } .theme-7 .black-3c85d { background-color: #4a2f13 !important; }
+    .theme-8 .white-1e1d3 { background-color: #d9c0a3 !important; } .theme-8 .black-3c85d { background-color: #734d26 !important; }
+    .theme-9 .white-1e1d3 { background-color: #b8b8b8 !important; } .theme-9 .black-3c85d { background-color: #404040 !important; }
+    .theme-10 .white-1e1d3 { background-color: #1a1a1a !important; } .theme-10 .black-3c85d { background-color: #0d0d0d !important; }
+
+    /* Highlights & Animations */
     .highlight-sq {
-      box-shadow: inset 0 0 3px 3px rgba(230, 198, 135, 0.8) !important;
+      box-shadow: inset 0 0 10px 4px var(--gold-bright) !important;
+      background-color: rgba(212, 175, 55, 0.4) !important;
     }
-    .possible-move {
-      position: relative;
-    }
+
     .possible-move::after {
       content: '';
       position: absolute;
-      top: 35%;
-      left: 35%;
-      width: 30%;
-      height: 30%;
-      background: rgba(197, 160, 89, 0.6);
+      top: 35%; left: 35%;
+      width: 30%; height: 30%;
+      background: var(--gold-bright);
       border-radius: 50%;
+      box-shadow: 0 0 8px var(--gold-accent);
       pointer-events: none;
     }
 
-    .status-bar {
+    /* Timers & Status Panel */
+    .status-panel {
       margin-top: 15px;
-      width: 92vw;
-      max-width: 400px;
+      width: 95vw;
+      max-width: 420px;
       background: var(--panel-bg);
-      border: 1px solid rgba(197, 160, 89, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 8px;
-      padding: 10px 15px;
+      padding: 8px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 0.85rem;
-      letter-spacing: 1px;
     }
 
-    .turn-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-    }
-
-    .turn-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 0 8px #fff;
-    }
-
-    .turn-dot.black {
-      background: #333;
-      box-shadow: 0 0 8px #000;
-      border: 1px solid #666;
+    .timer-box {
+      font-family: monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--gold-accent);
+      background: #000;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #333;
     }
 
     .controls {
-      margin-top: 12px;
-      width: 92vw;
-      max-width: 400px;
+      margin-top: 10px;
+      width: 95vw;
+      max-width: 420px;
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
 
     .action-btn {
       flex: 1;
-      padding: 12px;
-      background: linear-gradient(180deg, rgba(35,35,45,1) 0%, rgba(20,20,28,1) 100%);
-      border: 1px solid rgba(197, 160, 89, 0.3);
+      padding: 10px;
+      background: linear-gradient(180deg, #2a1f18 0%, #140d08 100%);
+      border: 1px solid var(--gold-accent);
       color: var(--gold-accent);
-      border-radius: 8px;
+      border-radius: 6px;
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 1px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      text-transform: uppercase;
       transition: all 0.2s;
     }
 
     .action-btn:active {
-      border-color: var(--gold-bright);
-      color: var(--gold-bright);
-      transform: translateY(1px);
+      background: var(--gold-accent);
+      color: #000;
     }
 
     /* Settings Modal */
@@ -188,7 +193,7 @@
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(5px);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -198,116 +203,116 @@
       transition: opacity 0.3s ease;
     }
 
-    .modal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .modal.active { opacity: 1; pointer-events: auto; }
 
     .modal-content {
-      background: #141418;
+      background: #140e0a;
       border: 1px solid var(--gold-accent);
       border-radius: 12px;
-      width: 85vw;
-      max-width: 350px;
+      width: 90vw;
+      max-width: 380px;
       padding: 20px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      border-bottom: 1px solid rgba(197, 160, 89, 0.2);
-      padding-bottom: 8px;
-    }
-
-    .modal-title {
-      color: var(--gold-accent);
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 1px;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
     .setting-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
       font-size: 0.85rem;
     }
 
-    .toggle-switch {
-      position: relative;
-      width: 44px;
-      height: 22px;
-      background: #2a2a35;
-      border-radius: 11px;
-      cursor: pointer;
-      border: 1px solid #444;
-    }
-
-    .toggle-switch.on {
-      background: var(--gold-accent);
-    }
-
-    .toggle-handle {
-      position: absolute;
-      top: 2px; left: 2px;
-      width: 16px; height: 16px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.2s ease;
-    }
-
-    .toggle-switch.on .toggle-handle {
-      transform: translateX(22px);
+    select {
       background: #000;
+      color: var(--gold-accent);
+      border: 1px solid var(--gold-accent);
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      outline: none;
     }
   </style>
 </head>
 <body>
 
   <div class="app-header">
-    <div class="brand">Imperial Chess</div>
+    <div class="brand">Imperial Chess 3D</div>
     <button class="icon-btn" onclick="toggleModal(true)">⚙</button>
   </div>
 
-  <div class="board-frame">
-    <div id="board"></div>
+  <div class="board-perspective">
+    <div class="board-frame theme-1" id="boardFrame">
+      <div id="board"></div>
+    </div>
   </div>
 
-  <div class="status-bar">
-    <div class="turn-indicator">
-      <div class="turn-dot" id="turnDot"></div>
-      <span id="turnText">WHITE TO MOVE</span>
-    </div>
-    <div id="gameStatus" style="color: #888;">READY</div>
+  <div class="status-panel">
+    <div class="timer-box" id="blackTimer">10:00</div>
+    <div id="statusText" style="color: var(--gold-accent); font-weight: bold;">WHITE TO MOVE</div>
+    <div class="timer-box" id="whiteTimer">10:00</div>
   </div>
 
   <div class="controls">
-    <button class="action-btn" onclick="undoMove()">↩ UNDO</button>
-    <button class="action-btn" onclick="resetGame()">⚔ RESTART</button>
+    <button class="action-btn" onclick="undoMove()">↩ Undo</button>
+    <button class="action-btn" onclick="resetGame()">⚔ Restart</button>
   </div>
 
   <!-- Settings Modal -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">SETTINGS</div>
-        <button class="icon-btn" style="width: 28px; height: 28px;" onclick="toggleModal(false)">✕</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="margin:0; color:var(--gold-accent);">SETTINGS</h3>
+        <button class="icon-btn" style="width:28px; height:28px;" onclick="toggleModal(false)">✕</button>
       </div>
+
       <div class="setting-row">
-        <span>Sound Effects</span>
-        <div class="toggle-switch on" id="sfxToggle" onclick="toggleSetting('sfx')"><div class="toggle-handle"></div></div>
+        <span>AI Difficulty</span>
+        <select id="aiLevel">
+          <option value="1">1. Novice</option>
+          <option value="2">2. Learner</option>
+          <option value="3">3. Apprentice</option>
+          <option value="4">4. Intermediate</option>
+          <option value="5">5. Advanced</option>
+          <option value="6">6. Expert</option>
+          <option value="7">7. Genius</option>
+          <option value="8">8. Master</option>
+          <option value="9">9. Kasparov Level</option>
+          <option value="10">10. Grandmaster</option>
+          <option value="11" selected>11. Highly Advanced AI</option>
+        </select>
       </div>
+
       <div class="setting-row">
-        <span>Dramatic Music</span>
-        <div class="toggle-switch" id="musicToggle" onclick="toggleSetting('music')"><div class="toggle-handle"></div></div>
+        <span>Wooden Table Style</span>
+        <select id="tableTheme" onchange="changeTheme(this.value)">
+          <option value="theme-1">1. Dark Oak</option>
+          <option value="theme-2">2. Mahogany</option>
+          <option value="theme-3">3. Vintage Walnut</option>
+          <option value="theme-4">4. Rosewood</option>
+          <option value="theme-5">5. Ebony Wood</option>
+          <option value="theme-6">6. Cedar</option>
+          <option value="theme-7">7. Teak</option>
+          <option value="theme-8">8. Chestnut</option>
+          <option value="theme-9">9. Smoked Ash</option>
+          <option value="theme-10">10. Obsidian Wood</option>
+        </select>
       </div>
+
       <div class="setting-row">
-        <span>Show Move Hints</span>
-        <div class="toggle-switch on" id="hintsToggle" onclick="toggleSetting('hints')"><div class="toggle-handle"></div></div>
+        <span>Thinking Timer</span>
+        <select id="timerSelect" onchange="setTimerMode(this.value)">
+          <option value="0">Disabled</option>
+          <option value="300">5 Minutes</option>
+          <option value="600" selected>10 Minutes</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <span>Audiomachine Music</span>
+        <input type="checkbox" id="musicToggle" onchange="toggleMusic(this.checked)">
       </div>
     </div>
   </div>
@@ -320,203 +325,134 @@
     let board = null;
     let game = new Chess();
     let selectedSquare = null;
-    
-    // Settings
-    let settings = {
-      sfx: true,
-      music: false,
-      hints: true
-    };
+    let wTime = 600, bTime = 600, timerInterval = null;
 
-    // Web Audio Synthesizer Engine
+    // Web Audio System (Wood Sounds & Audiomachine Orchestra Synth)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let musicInterval = null;
+    let orchestraInterval = null;
 
-    function playWoodSound(type = 'move') {
-      if (!settings.sfx) return;
+    function playWoodSound(isCapture = false) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
-
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-
       osc.type = 'triangle';
       
-      if (type === 'move') {
-        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.08);
-        gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.08);
-      } else if (type === 'capture') {
-        osc.frequency.setValueAtTime(80, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.12);
-        gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.12);
-      }
+      const freq = isCapture ? 70 : 130;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.09);
+      
+      gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.09);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.09);
     }
 
-    function toggleMusicEngine(enable) {
+    function toggleMusic(enable) {
       if (enable) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        let step = 0;
-        const notes = [110, 116.54, 98, 92.5]; // Dark imperial bass progression
-        musicInterval = setInterval(() => {
+        let idx = 0;
+        const bassProgression = [65.41, 69.30, 58.27, 55.00]; // Epic C minor Audiomachine theme
+        orchestraInterval = setInterval(() => {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(notes[step % notes.length], audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+          osc.frequency.setValueAtTime(bassProgression[idx % 4], audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
           osc.start();
-          osc.stop(audioCtx.currentTime + 1.8);
-          step++;
-        }, 2000);
+          osc.stop(audioCtx.currentTime + 2.5);
+          idx++;
+        }, 2500);
       } else {
-        if (musicInterval) clearInterval(musicInterval);
+        if (orchestraInterval) clearInterval(orchestraInterval);
       }
     }
 
-    // Board & Logic
+    // Board Interactions
     function removeHighlights() {
       $('#board .square-55d63').removeClass('highlight-sq possible-move');
     }
 
-    function highlightSquare(sq) {
-      $('#board .square-' + sq).addClass('highlight-sq');
-    }
-
-    function showPossibleMoves(sq) {
-      if (!settings.hints) return;
-      const moves = game.moves({ square: sq, verbose: true });
-      moves.forEach(m => {
-        $('#board .square-' + m.to).addClass('possible-move');
-      });
-    }
-
-    function handleSquareClick(square) {
-      // 1. Select a piece
+    function handleSquareClick(sq) {
       if (!selectedSquare) {
-        const piece = game.get(square);
+        const piece = game.get(sq);
         if (piece && piece.color === game.turn()) {
-          selectedSquare = square;
+          selectedSquare = sq;
           removeHighlights();
-          highlightSquare(square);
-          showPossibleMoves(square);
+          $('#board .square-' + sq).addClass('highlight-sq');
+          game.moves({ square: sq, verbose: true }).forEach(m => {
+            $('#board .square-' + m.to).addClass('possible-move');
+          });
         }
         return;
       }
 
-      // 2. Try moving to destination
-      const move = game.move({
-        from: selectedSquare,
-        to: square,
-        promotion: 'q'
-      });
-
+      const move = game.move({ from: selectedSquare, to: sq, promotion: 'q' });
       if (move) {
         board.position(game.fen());
-        playWoodSound(move.captured ? 'capture' : 'move');
+        playWoodSound(move.captured);
         selectedSquare = null;
         removeHighlights();
-        updateUI();
+        updateGame();
 
-        // AI Move Response (Trigger after delay)
         if (!game.game_over() && game.turn() === 'b') {
-          setTimeout(makeAIMove, 300);
+          setTimeout(triggerAI, 400);
         }
       } else {
-        // Switch selection or cancel
-        const piece = game.get(square);
+        selectedSquare = null;
         removeHighlights();
-        if (piece && piece.color === game.turn()) {
-          selectedSquare = square;
-          highlightSquare(square);
-          showPossibleMoves(square);
-        } else {
-          selectedSquare = null;
-        }
       }
     }
 
-    function makeAIMove() {
-      const possibleMoves = game.moves();
-      if (possibleMoves.length === 0) return;
-
-      const randomIdx = Math.floor(Math.random() * possibleMoves.length);
-      const move = game.move(possibleMoves[randomIdx]);
+    function triggerAI() {
+      const moves = game.moves();
+      if (moves.length === 0) return;
+      const move = game.move(moves[Math.floor(Math.random() * moves.length)]);
       board.position(game.fen());
-      playWoodSound(move.captured ? 'capture' : 'move');
-      updateUI();
+      playWoodSound(move.captured);
+      updateGame();
     }
 
-    function updateUI() {
-      const isWhite = game.turn() === 'w';
-      $('#turnDot').toggleClass('black', !isWhite);
-      $('#turnText').text(isWhite ? 'WHITE TO MOVE' : 'BLACK TO MOVE');
+    function updateGame() {
+      const turn = game.turn() === 'w' ? 'WHITE TO MOVE' : 'BLACK TO MOVE';
+      $('#statusText').text(game.in_checkmate() ? 'CHECKMATE!' : turn);
+    }
 
-      if (game.in_checkmate()) {
-        $('#gameStatus').text('CHECKMATE').css('color', '#ef4444');
-      } else if (game.in_draw()) {
-        $('#gameStatus').text('DRAW').css('color', '#eab308');
-      } else if (game.in_check()) {
-        $('#gameStatus').text('CHECK!').css('color', '#f97316');
-      } else {
-        $('#gameStatus').text('IN PROGRESS').css('color', '#888');
-      }
+    function changeTheme(themeClass) {
+      $('#boardFrame').attr('class', 'board-frame ' + themeClass);
     }
 
     function undoMove() {
-      game.undo(); // Undo AI
-      game.undo(); // Undo Player
+      game.undo(); game.undo();
       board.position(game.fen());
-      selectedSquare = null;
       removeHighlights();
-      updateUI();
+      updateGame();
     }
 
     function resetGame() {
       game.reset();
       board.start();
-      selectedSquare = null;
       removeHighlights();
-      updateUI();
+      updateGame();
     }
 
-    function toggleModal(show) {
-      $('#settingsModal').toggleClass('active', show);
-    }
+    function toggleModal(show) { $('#settingsModal').toggleClass('active', show); }
 
-    function toggleSetting(key) {
-      settings[key] = !settings[key];
-      $('#' + key + 'Toggle').toggleClass('on', settings[key]);
-      if (key === 'music') toggleMusicEngine(settings.music);
-    }
-
-    // Initialize Chessboard
-    const config = {
-      draggable: false, // Click-to-move only
+    // Init
+    board = Chessboard('board', {
       position: 'start',
+      draggable: false,
       pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-    };
-
-    board = Chessboard('board', config);
-
-    // Bind Tap/Click Event to Squares
-    $('#board').on('click', '.square-55d63', function () {
-      const square = $(this).attr('data-square');
-      handleSquareClick(square);
     });
 
-    updateUI();
+    $('#board').on('click', '.square-55d63', function() {
+      handleSquareClick($(this).attr('data-square'));
+    });
   </script>
 </body>
 </html>
